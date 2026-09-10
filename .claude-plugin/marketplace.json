@@ -1,0 +1,32 @@
+{
+  "name": "eplan-skills",
+  "owner": {
+    "name": "covagashi",
+    "url": "https://github.com/covagashi"
+  },
+  "metadata": {
+    "description": "Standalone Claude Code skills for EPLAN Electric P8 development",
+    "version": "1.1.0"
+  },
+  "plugins": [
+    {
+      "name": "eplan-development",
+      "source": "./",
+      "description": "Teach Claude to develop with EPLAN Electric P8: C# scripting, EPLAN API (parts database, 3D), Remote Client automation, verified action parameters, and production pitfalls. Covers EPLAN 2022-2027.",
+      "version": "1.1.0",
+      "author": {
+        "name": "covagashi",
+        "url": "https://github.com/covagashi"
+      },
+      "license": "MIT",
+      "keywords": [
+        "eplan",
+        "eplan-p8",
+        "electrical-engineering",
+        "csharp",
+        "automation"
+      ],
+      "category": "development"
+    }
+  ]
+}
