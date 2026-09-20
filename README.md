@@ -1,12 +1,11 @@
 # EPLAN agent skills — for EPLAN Electric P8 & EEC Pro
 
-[![skills.sh](https://skills.sh/b/covagashi/eplan-development-skill)](https://skills.sh/covagashi/eplan-development-skill)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Agent Skills](https://skills.sh) for EPLAN development — install once, and the
-**router** loads the right skill for whatever you're automating: **EPLAN Electric
-P8** (C# scripting, the EPLAN API, Remote Client) or **EPLAN EEC Pro** (typicals,
-the mechatronic model, the formula language, generation).
+Agent-agnostic [skills](https://agentskills.io) for EPLAN development — install
+once, and the **router** loads the right skill for whatever you're automating:
+**EPLAN Electric P8** (C# scripting, the EPLAN API, Remote Client) or **EPLAN EEC
+Pro** (typicals, the mechatronic model, the formula language, generation).
 
 Teaches your agent the traps that only show up in production — silent compile
 failures, the command-blocking issue, dispose discipline, the CS0234 namespaces
@@ -18,7 +17,10 @@ installation, not from the manual alone.
 
 ## Install
 
-### skills.sh (any agent)
+### Any agent (skills CLI)
+
+The [`skills` CLI](https://github.com/vercel-labs/skills) installs into 60+
+agents (Claude Code, Cursor, Codex, Copilot, Windsurf, …):
 
 ```bash
 npx skills add covagashi/eplan-development-skill
@@ -42,18 +44,21 @@ git clone https://github.com/covagashi/eplan-development-skill
 ```
 
 ```powershell
-# Windows - personal skills, available in every project
-xcopy /E /I eplan-development-skill\skills\eplan-p8\eplan-development "$env:USERPROFILE\.claude\skills\eplan-development"
-xcopy /E /I eplan-development-skill\skills\eec-pro\eec-pro-development "$env:USERPROFILE\.claude\skills\eec-pro-development"
+# Windows - personal skills, available in every project.
+# ~/.agents/skills is the universal dir most agents read; use ~/.claude/skills for Claude Code.
+xcopy /E /I eplan-development-skill\skills\eplan-p8\eplan-development "$env:USERPROFILE\.agents\skills\eplan-development"
+xcopy /E /I eplan-development-skill\skills\eec-pro\eec-pro-development "$env:USERPROFILE\.agents\skills\eec-pro-development"
 ```
 
 ```bash
-# macOS / Linux
-cp -r eplan-development-skill/skills/eplan-p8/eplan-development ~/.claude/skills/
-cp -r eplan-development-skill/skills/eec-pro/eec-pro-development ~/.claude/skills/
+# macOS / Linux — universal dir (Amp, Codex, Cline, …). Use ~/.claude/skills for Claude Code.
+cp -r eplan-development-skill/skills/eplan-p8/eplan-development ~/.agents/skills/
+cp -r eplan-development-skill/skills/eec-pro/eec-pro-development ~/.agents/skills/
+cp -r eplan-development-skill/router ~/.agents/skills/router
 ```
 
-For a single project, copy into `<your-project>/.claude/skills/` instead.
+For a single project, copy into `<your-project>/.agents/skills/` (or
+`.claude/skills/`) instead.
 
 ---
 
