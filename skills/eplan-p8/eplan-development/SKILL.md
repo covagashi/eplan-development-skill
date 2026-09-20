@@ -23,7 +23,7 @@ Comprehensive guide for developing with EPLAN Electric P8: scripting (C#), the E
 - **`references/actions-reference.md`** — Executing actions with `CommandLineInterpreter` + `ActionCallingContext`; catalog of common actions (backup, export PDF, reports, labels, edit, selectionset…) with their parameters.
 - **`references/core-classes.md`** — `Progress`, `Decider`, `PathMap` variables, `Settings`, `MultiLangString`, ribbon/context menus, `QuietModeStep`, system messages (`BaseException`, `SysMessagesCollection`).
 - **`references/api-data-access.md`** — Parts database (`MDPartsManagement`), reading *and writing* part properties (`AddPart`/`RemovePart`, the `MDPropertyValue` constructor that doesn't exist, the `AmbiguousMatchException` every name-based property lookup hits), user-defined properties, multilanguage string parsing, resolving `$(MD_DOCUMENTS)`-style paths. Also: why `using Eplan.EplApi.DataModel;`/`...HEServices;` don't compile in scripts (CS0234) and how to reach that object model anyway. Also: `SymbolLibrary`/`Symbol` enumeration — why walking `Symbol(lib, int)` by index must `continue`, never `break`, on a construction miss (SymbolIds are sparse, not contiguous), and why a symbol's real identity comes from `Symbol.Properties.SYMB_DESC`/`FUNC_CATEGORY`, never from its short name or IEC-letter prefix.
-- **`references/eec-typicals.md`** — Generating a project from an EEC One “typical” workbook without EEC: reading the sheet (it is already condition-filtered), inserting page/window macros through `Insert`, renaming pages to the sheet's structure via `PagePropertyList`, and the page-index collision that bites on the second cabinet.
+- **`references/eec-typicals.md`** — Generating a project from an EEC One “typical” workbook without EEC: reading the sheet (it is already condition-filtered), inserting page/window macros through `Insert`, renaming pages to the sheet's structure via `PagePropertyList`, and the page-index collision that bites on the second cabinet. (For the EEC Pro side — the mechatronic model, conditions, formula language — load the `eec-pro-development` skill.)
 - **`references/e3d-installation-spaces.md`** — The version-proof runtime-reflection recipe for reaching `Eplan.EplApi.DataModel`/`HEServices` from a script (`LockingStep`, `FindType()` assembly scanning, EPLAN 2027's `...Netu`-suffixed assemblies), applied to creating 3D installation spaces and inserting window macros headlessly.
 - **`references/remoting.md`** — `EplanRemoteClient`: server discovery, dynamic ports, headless launch, version gotchas (2023 vs 2025), executing actions and scripts remotely, Cogineer generation from Excel.
 - **`references/pitfalls.md`** — CRITICAL: the command-blocking issue (message loop / monitor thread), `using`/`Dispose` discipline, sequential execution model, error-handling rules, and the compile errors that masquerade as timeouts, including which C# each version's script engine actually accepts (#9).
@@ -36,14 +36,18 @@ identifiers, and many are undocumented in the manual. **Resolve them against a
 source before writing them.** In order of preference:
 
 1. **Ask EPLAN itself.** If the session can reach a running EPLAN — through an
-   MCP server, a Remote Client, or a script you can execute — introspection
+   MCP server (e.g. the `eplan` action server from
+   [eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp)), a Remote Client,
+   or a script you can execute — introspection
    beats any document: enumerate the registered actions and their parameters,
    and reflect over `Eplan.EplApi.*` to confirm a member exists before calling
    it. See `references/actions-reference.md` and `references/api-data-access.md`.
 2. **Search the EPLAN documentation** with whatever docs-search tool the host
    provides. If there is none, two public endpoints index the EPLAN P8 help and
    need no auth (they are one deployment of this idea, not a dependency of this
-   skill — any equivalent index works):
+   skill — any equivalent index works). They are also exposed as the MCP servers
+   `eplan-rag` (2026, semantic) and `eplan-wiki-2027` (2027, keyword) — both
+   preconfigured in this repo's `.mcp.json`:
 
    ```bash
    # Keyword / full-text (SQLite FTS5 + bm25), EPLAN 2027 docs.

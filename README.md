@@ -1,53 +1,92 @@
-# eplan-development — a Claude Code skill for EPLAN Electric P8
+# EPLAN agent skills — for EPLAN Electric P8 & EEC Pro
 
-Teaches Claude how to develop with **EPLAN Electric P8**: C# scripting, the EPLAN API,
-and Remote Client automation — including the traps that only show up in production
-(silent compile failures, the command-blocking issue, dispose discipline, the CS0234
-namespaces that are reachable anyway).
+[![skills.sh](https://skills.sh/b/covagashi/eplan-development-skill)](https://skills.sh/covagashi/eplan-development-skill)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Distilled from working code and from live testing against a real installation, not from
-the manual alone. Every claim marked "measured" was checked on a running EPLAN.
+[Agent Skills](https://skills.sh) for EPLAN development — install once, and the
+**router** loads the right skill for whatever you're automating: **EPLAN Electric
+P8** (C# scripting, the EPLAN API, Remote Client) or **EPLAN EEC Pro** (typicals,
+the mechatronic model, the formula language, generation).
 
-**This skill is host-agnostic.** It carries no dependency on any particular MCP server,
-RAG, or wrapper: it teaches how to write the code and how to find the identifiers,
-whatever is driving EPLAN on your side — a script you paste into EPLAN's script manager,
-an MCP server, a Remote Client app, or a build pipeline.
+Teaches your agent the traps that only show up in production — silent compile
+failures, the command-blocking issue, dispose discipline, the CS0234 namespaces
+that are reachable anyway — plus how to drive EEC Pro's model → configuration →
+generation pipeline. Distilled from working code and live testing against a real
+installation, not from the manual alone.
 
 ---
 
 ## Install
 
-### As a plugin (recommended)
+### skills.sh (any agent)
 
-Inside Claude Code:
+```bash
+npx skills add covagashi/eplan-development-skill
+```
+
+### As a Claude Code plugin
 
 ```
 /plugin marketplace add covagashi/eplan-development-skill
-/plugin install eplan-development@eplan-skills
+/plugin install eplan@eplan-skills        # router + all skills
+/plugin install eplan-development@eplan-skills   # P8 only
+/plugin install eec-pro@eplan-skills             # EEC Pro only
 ```
 
 Update later with `/plugin marketplace update eplan-skills`.
 
-### Manually (copy the skill folder)
+### Manually
 
 ```bash
 git clone https://github.com/covagashi/eplan-development-skill
 ```
 
 ```powershell
-# Windows - personal skill, available in every project
-xcopy /E /I eplan-development-skill\skills\eplan-development "$env:USERPROFILE\.claude\skills\eplan-development"
+# Windows - personal skills, available in every project
+xcopy /E /I eplan-development-skill\skills\eplan-p8\eplan-development "$env:USERPROFILE\.claude\skills\eplan-development"
+xcopy /E /I eplan-development-skill\skills\eec-pro\eec-pro-development "$env:USERPROFILE\.claude\skills\eec-pro-development"
 ```
 
 ```bash
 # macOS / Linux
-cp -r eplan-development-skill/skills/eplan-development ~/.claude/skills/eplan-development
+cp -r eplan-development-skill/skills/eplan-p8/eplan-development ~/.claude/skills/
+cp -r eplan-development-skill/skills/eec-pro/eec-pro-development ~/.claude/skills/
 ```
 
-For a single project, copy to `<your-project>/.claude/skills/eplan-development` instead.
+For a single project, copy into `<your-project>/.claude/skills/` instead.
 
-Then restart Claude Code. The skill loads by itself on EPLAN-related tasks, or you can
-invoke it explicitly with `/eplan-development`.
+---
+
+## The MCP servers
+
+The skills are **host-agnostic** — useful on their own. Paired with the MCP
+servers from [eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp) the agent
+can also *query the EPLAN documentation* and *drive a running EPLAN*.
+
+This repo ships a [`.mcp.json`](.mcp.json) with the three **remote doc RAGs**
+(already deployed, no local data needed):
+
+| Server | Endpoint | Covers | Search |
+|---|---|---|---|
+| `eplan-rag` | `rag2026.covaga.xyz/mcp` | EPLAN P8 docs 2026 | Semantic |
+| `eplan-wiki-2027` | `rag2027.covaga.xyz/mcp` | EPLAN P8 docs 2027 | Keyword (FTS5) |
+| `eecpro-rag` | `rageecpro.covaga.xyz/mcp` | EEC Pro 2026 docs | Semantic, 36 categories |
+
+Or register them by hand:
+
+```bash
+claude mcp add eplan-rag       --transport http https://rag2026.covaga.xyz/mcp
+claude mcp add eplan-wiki-2027 --transport http https://rag2027.covaga.xyz/mcp
+claude mcp add eecpro-rag      --transport http https://rageecpro.covaga.xyz/mcp
+```
+
+(Older setups: `claude mcp add eecpro-rag -- npx mcp-remote https://rageecpro.covaga.xyz/mcp`,
+with `cmd /c` before `npx` on Windows.)
+
+The **local action server** (`eplan`, ~200 tools: run actions/scripts inside a
+running EPLAN, introspect the API live) installs separately — it needs Python +
+`pythonnet` on the EPLAN machine. See
+[eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp#local-eplan-automation-p8).
 
 ---
 
@@ -56,59 +95,45 @@ invoke it explicitly with `/eplan-development`.
 ```
 eplan-development-skill/
 ├── .claude-plugin/
-│   ├── marketplace.json          # so /plugin marketplace add works on this repo
-│   └── plugin.json
-└── skills/eplan-development/
-    ├── SKILL.md                  # entry point: the three dev models, lookup order, golden rules
-    └── references/
-        ├── script-basics.md      # script structure, [Start]/[DeclareAction]/[DeclareMenu], deployment
-        ├── actions-reference.md  # CommandLineInterpreter + a catalog of verified actions
-        ├── core-classes.md       # Progress, PathMap, Settings, MultiLangString, ribbon, context menus
-        ├── api-data-access.md    # parts DB (MDPartsManagement), properties, symbol enumeration
-        ├── e3d-installation-spaces.md  # reaching DataModel/HEServices by reflection; 3D spaces
-        ├── eec-typicals.md       # generating a project from an EEC One typical workbook, without EEC
-        ├── remoting.md           # EplanRemoteClient, dynamic ports, headless, Cogineer
-        ├── pitfalls.md           # blocking, threading, dispose, and compile errors that look like hangs
-        └── integration-patterns.md    # HTTP, SignalR, forwarding EPLAN system messages outward
+│   └── marketplace.json        # /plugin marketplace add works on this repo
+├── .mcp.json                   # the three remote doc-RAG MCP servers
+├── router/
+│   └── SKILL.md                # detects P8 vs EEC Pro + task → loads the right skill
+└── skills/
+    ├── eplan-p8/
+    │   └── eplan-development/
+    │       ├── SKILL.md        # the three dev models, lookup order, golden rules
+    │       └── references/     # script-basics, actions, core-classes,
+    │                           # api-data-access, e3d-installation-spaces,
+    │                           # eec-typicals, remoting, pitfalls, integration
+    └── eec-pro/
+        └── eec-pro-development/
+            ├── SKILL.md        # model → configure → generate pipeline, golden rules
+            └── references/
+                └── doc-categories.md   # the 36-category map of the EEC Pro doc index
 ```
 
-Claude reads `SKILL.md` first and pulls in only the reference file that matches the task,
-so the whole thing costs very little context until it is actually needed.
-
----
-
-## A taste of what it prevents
-
-- **`RegisterScript` vs `ExecuteScript`.** `[DeclareAction]`, `[DeclareEventHandler]` and
-  `[DeclareMenu]` install hooks and need `RegisterScript`; a `[Start]`-only script needs
-  `ExecuteScript` and registering it just earns a spurious warning.
-- **Compile errors are silent.** The engine accepts an old C# (C# 5 on 2026: no `?.`, no
-  `$"..."`, no `nameof`). A script that fails to compile still "succeeds" — the caller
-  just times out. The `CS####` line is sitting in EPLAN's message tree the whole time.
-- **CS0234 is a compile-time limit, not a capability limit.** `using
-  Eplan.EplApi.DataModel;` does not compile in a script, yet all 26 `Eplan.EplApi.*`
-  namespaces and 606 public types are reachable at runtime by reflection — and the
-  assembly names are *not* a clean version cutoff, so scan `AppDomain` before guessing.
-- **EPLAN actions are pseudo-asynchronous.** Without an active message loop, code after
-  `oCLI.Execute(...)` can hang forever.
-
----
+Each `SKILL.md` is the entry point; the agent pulls in only the reference file
+that matches the task, so it costs little context until needed.
 
 ## Coverage
 
-EPLAN Electric P8 **2022–2027**, with the version-specific notes called out where they
-matter: the ribbon API since 2022, remoting on by default in 2023 versus "Remote Client
-Access" + gRPC in 2025, the `...Netu`-suffixed managed assemblies in 2027, and
-.NET Framework 4.8.1 targeting.
+- **EPLAN Electric P8 2022–2027** — with the version-specific notes called out:
+  ribbon API since 2022, remoting defaults 2023 vs "Remote Client Access" + gRPC
+  in 2025, the `...Netu` assemblies in 2027, .NET Framework 4.8.1 targeting.
+- **EPLAN EEC Pro 2026** — mechatronic model, typicals/variants/conditions,
+  formula language, Form-UI, import formats, scripting, commands, Job Server, and
+  all generation targets (ECAD/P8, Pro Panel, PLC, Graph2D, text/Office, SAP).
 
 ## Pairs well with
 
-- **[eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp)** — an MCP server that
-  lets Claude *execute* EPLAN actions live, plus documentation RAGs. This skill teaches
-  Claude to write correct code; that one gives it hands. Neither requires the other.
-- **[eplan-ctxmenu-kit](https://github.com/covagashi/eplan-ctxmenu-kit)** — a worked
-  example of the context-menu material in `core-classes.md`: adding your own right-click
-  entries and reading the row the user clicked.
+- **[eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp)** — the MCP
+  servers: a local one that lets the agent *execute* inside EPLAN, plus the three
+  remote doc RAGs configured in `.mcp.json`. These skills teach the agent to write
+  correct code; the servers give it hands. Neither requires the other.
+- **[eplan-ctxmenu-kit](https://github.com/covagashi/eplan-ctxmenu-kit)** — a
+  worked example of the context-menu material: adding right-click entries and
+  reading the row the user clicked.
 
 ## License
 
