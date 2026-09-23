@@ -65,6 +65,8 @@ Three public indexes, three different strengths — pick deliberately:
 | `eplan-rag` · `rag2026.covaga.xyz` | P8 docs 2026 | Semantic (bge, ~57k vectors) | P8 questions phrased without exact identifiers |
 | `eplan-wiki-2027` · `rag2027.covaga.xyz` | P8 docs 2027 | Keyword/FTS5 + bm25 | Exact names — actions, classes, methods, error codes |
 
+The three remote indexes are maintained in [eplan-cloudflare-rags](https://github.com/covagashi/eplan-cloudflare-rags).
+
 Measured head-to-head: FTS5 wins exact-name lookups; semantic wins when the query
 shares no vocabulary with the docs. When both P8 indexes are available and you know
 the identifier, hit 2027 first.

@@ -64,11 +64,13 @@ For a single project, copy into `<your-project>/.agents/skills/` (or
 
 ## The MCP servers
 
-The skills are **host-agnostic** — useful on their own. Paired with the MCP
-servers from [eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp) the agent
-can also *query the EPLAN documentation* and *drive a running EPLAN*.
+The skills are **host-agnostic** — useful on their own. Paired with the remote
+[documentation RAGs](https://github.com/covagashi/eplan-cloudflare-rags), the agent can
+*query the EPLAN documentation*. The local action server in
+[eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp) can *drive a running EPLAN*.
 
 This repo ships a [`.mcp.json`](.mcp.json) with the three **remote doc RAGs**
+from [eplan-cloudflare-rags](https://github.com/covagashi/eplan-cloudflare-rags)
 (already deployed, no local data needed):
 
 | Server | Endpoint | Covers | Search |
@@ -132,10 +134,10 @@ that matches the task, so it costs little context until needed.
 
 ## Pairs well with
 
-- **[eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp)** — the MCP
-  servers: a local one that lets the agent *execute* inside EPLAN, plus the three
-  remote doc RAGs configured in `.mcp.json`. These skills teach the agent to write
-  correct code; the servers give it hands. Neither requires the other.
+- **[eplan-rag-mcp](https://github.com/covagashi/eplan-rag-mcp)** — the local MCP
+  server that lets the agent *execute* inside a running EPLAN.
+- **[eplan-cloudflare-rags](https://github.com/covagashi/eplan-cloudflare-rags)** —
+  the three remote documentation RAGs configured in `.mcp.json`.
 - **[eplan-ctxmenu-kit](https://github.com/covagashi/eplan-ctxmenu-kit)** — a
   worked example of the context-menu material: adding right-click entries and
   reading the row the user clicked.

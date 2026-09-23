@@ -47,7 +47,8 @@ source before writing them.** In order of preference:
    need no auth (they are one deployment of this idea, not a dependency of this
    skill — any equivalent index works). They are also exposed as the MCP servers
    `eplan-rag` (2026, semantic) and `eplan-wiki-2027` (2027, keyword) — both
-   preconfigured in this repo's `.mcp.json`:
+   preconfigured in this repo's `.mcp.json`. Their source and deployment
+   instructions live in [eplan-cloudflare-rags](https://github.com/covagashi/eplan-cloudflare-rags):
 
    ```bash
    # Keyword / full-text (SQLite FTS5 + bm25), EPLAN 2027 docs.

@@ -58,7 +58,9 @@ skill: `../eplan-p8/eplan-development/references/eec-typicals.md`.
 ## Looking things up — never guess identifiers
 
 EEC Pro identifiers (formula functions, commands, parameters, VMArgs) are exact and
-many are documented only in the official help. Resolve them against the doc index:
+many are documented only in the official help. The index source lives in
+[eplan-cloudflare-rags](https://github.com/covagashi/eplan-cloudflare-rags/tree/main/cloudflare-rag-eecpro).
+Resolve identifiers against the doc index:
 
 1. **`eecpro-rag` MCP** (if configured — this repo ships it in `.mcp.json`):
    `eecpro_search(query, topK, category?)` — semantic search over the full EEC Pro
